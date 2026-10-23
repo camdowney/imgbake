@@ -1,6 +1,5 @@
 # PyInstaller build for the standalone app:  pyinstaller imgbake.spec
-# Windows: one self-contained Imgbake.exe in dist/.  macOS: dist/Imgbake.app.
-# Linux: a dist/Imgbake folder. Its Qt web engine is too big to unpack on every start, as one file would.
+# Windows/Linux: one self-contained executable in dist/.  macOS: dist/Imgbake.app.
 import os, sys
 
 linux = sys.platform.startswith("linux")
@@ -41,8 +40,5 @@ if sys.platform == "darwin":
     coll = COLLECT(exe, a.binaries, a.datas, name="Imgbake")
     app = BUNDLE(coll, name="Imgbake.app", icon="icon.png", bundle_identifier="com.imgbake.app",
                  info_plist={"NSHighResolutionCapable": True})
-elif linux:
-    exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name="Imgbake", console=False)
-    coll = COLLECT(exe, a.binaries, a.datas, name="Imgbake", upx=False)
 else:
     exe = EXE(pyz, a.scripts, a.binaries, a.datas, [], name="Imgbake", icon="icon.png", console=False, upx=False)

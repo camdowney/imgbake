@@ -57,7 +57,7 @@ jobs:
       - name: Smoke test and package (Linux)
         if: runner.os == 'Linux'
         run: |
-          dist/Imgbake/Imgbake --help > /dev/null
+          dist/Imgbake --help > /dev/null
           tar -czf ${{ matrix.asset }} -C dist Imgbake
 
       - uses: actions/upload-artifact@v4

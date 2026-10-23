@@ -12,7 +12,7 @@ Grab the file for your computer from the [latest release](../../releases/latest)
 | --------------------- | ----------------------- | ----------------------------------------------------------------- |
 | Windows               | `Imgbake-Windows.exe`   | Double-click it.                                                  |
 | macOS (Apple Silicon) | `Imgbake-macOS.zip`     | Unzip, move `Imgbake.app` to Applications, double-click it.       |
-| Linux                 | `Imgbake-Linux.tar.gz`  | Extract, open the `Imgbake` folder, double-click `Imgbake` in it. |
+| Linux                 | `Imgbake-Linux.tar.gz`  | Extract, double-click `Imgbake`.                                  |
 
 ### The first time you open it
 
@@ -71,4 +71,4 @@ git push origin v1.0.0
 
 To build one locally: `pip install -r requirements.txt pyinstaller`, then `pyinstaller imgbake.spec`. The result goes in `dist/`.
 
-The window is a web page drawn by the system's own browser engine (Edge WebView2 on Windows, WebKit on macOS), so those apps are small. Linux has no engine every distribution shares, so the Linux app brings Qt's, which makes it the big download.
+The window is a web page drawn by the system's own browser engine (Edge WebView2 on Windows, WebKit on macOS), so those apps are small. Linux has no engine every distribution shares, so the Linux app brings Qt's, which makes it the big download, and it takes a few seconds to start while it unpacks.
