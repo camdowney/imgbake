@@ -368,6 +368,9 @@ def system_env():
         else: env["LD_LIBRARY_PATH"] = orig
         for k in ("QT_PLUGIN_PATH", "QML2_IMPORT_PATH", "QTWEBENGINEPROCESS_PATH", "QTWEBENGINE_RESOURCES_PATH"):
             env.pop(k, None)
+    env.pop("IMGBAKE_CHILD", None)
+    for k, v in SOFTWARE_GL.items():      # supervise()'s fallback is for this app only
+        if env.get(k) == v: env.pop(k)
     return env
 
 
@@ -1172,12 +1175,38 @@ def run_browser(url, seen):
         print("\nstopped")
 
 
+# Qt drawing everything in software: slower, but needs no OpenGL from the system
+SOFTWARE_GL = {"QT_XCB_GL_INTEGRATION": "none", "QT_QUICK_BACKEND": "software",
+               "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu"}
+
+
+def supervise():
+    """Linux: run the app in a child process. When the system's OpenGL can't make a window (old or
+    mismatched drivers, VMs, remote desktops), Qt aborts the whole process with nothing to catch, so if the
+    child dies like that early on, try again with software rendering, then in the browser."""
+    me = [sys.executable] if FROZEN else [sys.executable, os.path.abspath(__file__)]
+    for extra, flag in ((None, []), (SOFTWARE_GL, []), (None, ["--browser"])):
+        env = {**os.environ, "IMGBAKE_CHILD": "1", **(extra or {})}
+        t0 = time.monotonic()
+        try:
+            r = subprocess.call(me + sys.argv[1:] + flag, env=env)
+        except KeyboardInterrupt:
+            return 0
+        if r >= 0 or time.monotonic() - t0 > 60:   # closed normally (or crashed well after starting)
+            return r
+        print(f"The window crashed at startup (signal {-r}), trying again "
+              + ("with software rendering." if not extra else "in the browser."))
+    return r
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("image", nargs="?", help="image to open")
     p.add_argument("--browser", action="store_true", help="use your web browser instead of a window")
     p.add_argument("--port", type=int, default=0, help="local port for the page (default: any free one)")
     args = p.parse_args()
+    if sys.platform.startswith("linux") and not args.browser and not os.environ.get("IMGBAKE_CHILD"):
+        sys.exit(supervise())
     ed = Editor()
     if args.image:
         try:

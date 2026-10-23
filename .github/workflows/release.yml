@@ -36,7 +36,7 @@ jobs:
           python -c "import tkinter"
       - name: Linux libraries to bundle
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libxcb-cursor0
+        run: sudo apt-get update && sudo apt-get install -y libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-util1
       - name: Test
         run: python test_imgbake.py
       - name: Build
